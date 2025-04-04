@@ -1,0 +1,38 @@
+#database.py
+import dqlite3
+
+#initialize the database connection and create the table
+class Database:
+    def_init_(self, db_name = 'todo.db'):
+        self.connection = sqlite3.connect(db_name)
+        self.cursor = self.connection.cursor()
+        self.create_table()
+
+    #create the 'todo' table if it doesn't exist already
+    def create_table(self):
+        self.cursor.execute('''CREATE TABLE IF NOT EXISTS todo (id INTEGER PRIMARY KEY AUTOINCREMENT, content TEXT NOT NULL, is_completed BOOLEAN NOT NULL DEFAULT 0)''')
+        self.connection.commit()
+
+    #add a new To-do item to the database
+    def add_todo(self, content):
+        self.cursor.execute('INSERT INTO todo (content) VALUES (?)', (content,))
+        self.connection.commit()
+
+    #retrieve all To-do items from the database
+    def get_todos(self):
+        self.cursor.execute('SELECT * FROM todo')
+        return self.cursor.fetchall()
+
+    #update an existing To-do item based on its ID
+    def update_todo(self, todo_id, content, is_completed):
+        self.cursor.execute('UPDATE todo SET content = ?, is_completed = ? WHERE id = ?', (content, is_completed, todo_id))
+        self.connection.commit()
+
+    #delete a To-do item from the database based on its ID
+    def delete_todo(self, todo_id):
+        self.cursor.execute('DELETE FROM todo WHERE id = ?', (todo_id,))
+        self.connection.commit()
+
+    #close the database connection
+    def close(self):
+        self.connection.close()
