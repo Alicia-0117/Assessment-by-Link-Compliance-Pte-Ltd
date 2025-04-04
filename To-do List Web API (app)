@@ -1,0 +1,49 @@
+#app.py
+from database import Database
+
+#display the list of To-do items
+def display_todos(todos):
+    print("\nTo-do List:")
+    for todo in todos:
+        #mark completed items with a checkmark and incomplete with a cross
+        status = "✓" if todo[2] else "✗"
+        print(f"{todo[0]}: {todo[1]} [{status}]")
+    print()
+
+#create an instance of the database class
+def main():
+    db = Database()
+
+#display the menu options    
+while True:
+        print("1. Add To-do")
+        print("2. View To-dos")
+        print("3. Update To-do")
+        print("4. Delete To-do")
+        print("5. Exit")
+        choice = input("Choose an option: ")
+ 
+        if choice == '1':
+            content = input("Enter To-do content: ") #add a new To-do item 
+            db.add_todo(content)
+        elif choice == '2': 
+            todos = db.get_todos()  #view all To-do items
+            display_todos(todos)
+        elif choice == '3':
+            todo_id = int(input("Enter To-do ID to update: ")) #updae an existing To-do item
+            content = input("Enter new content: ")
+            is_completed = input("Is it completed? (y/n): ").lower() == 'y'
+            db.update_todo(todo_id, content, is_completed)
+        elif choice == '4': 
+            todo_id = int(input("Enter To-do ID to delete: "))  #delete a To-do item
+            db.delete_todo(todo_id)
+        elif choice == '5': 
+            break #exit the application
+        else: 
+            print("Invalid option. Please try again.")  #handle invalid input
+
+    #close the database connection before exiting
+    db.close()
+
+if __name__ == "__main__":
+    main()
