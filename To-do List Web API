@@ -1,0 +1,95 @@
+import sqlite3
+
+#function to create the database and the todo table
+def create_database():
+    connection = sqlite3.connect('todo.db')
+    cursor = connection.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS todo (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            content TEXT NOT NULL,
+            is_completed BOOLEAN NOT NULL DEFAULT 0
+        )
+    ''')
+    connection.commit()
+    connection.close()
+
+#function to add a new To-do item
+def add_todo(content):
+    connection = sqlite3.connect('todo.db')
+    cursor = connection.cursor()
+    cursor.execute('INSERT INTO todo (content) VALUES (?)', (content,))
+    connection.commit()
+    connection.close()
+
+#function to get all To-do items
+def get_todos():
+    connection = sqlite3.connect('todo.db')
+    cursor = connection.cursor()
+    cursor.execute('SELECT * FROM todo')
+    todos = cursor.fetchall()
+    connection.close()
+    return todos
+
+#function to update a To-do item
+def update_todo(todo_id, content, is_completed):
+    connection = sqlite3.connect('todo.db')
+    cursor = connection.cursor()
+    cursor.execute('UPDATE todo SET content = ?, is_completed = ? WHERE id = ?', (content, is_completed, todo_id))
+    connection.commit()
+    connection.close()
+
+#function to delete a To-do item
+def delete_todo(todo_id):
+    connection = sqlite3.connect('todo.db')
+    cursor = connection.cursor()
+    cursor.execute('DELETE FROM todo WHERE id = ?', (todo_id,))
+    connection.commit()
+    connection.close()
+
+#function to display the To-do list
+def display_todos(todos):
+    print("\nTo-do List:")
+    for todo in todos:
+        status = "✓" if todo[2] else "✗"  # Check if completed
+        print(f"{todo[0]}: {todo[1]} [{status}]")
+    print()
+
+#main function to run the application
+def main():
+    create_database()  #create the database and table
+
+    while True:
+        print("1. Add To-do")
+        print("2. View To-dos")
+        print("3. Update To-do")
+        print("4. Delete To-do")
+        print("5. Exit")
+        choice = input("Choose an option: ")
+
+        if choice == '1':
+            content = input("Enter To-do content: ")
+            add_todo(content)
+
+        elif choice == '2':
+            todos = get_todos()
+            display_todos(todos)
+
+        elif choice == '3':
+            todo_id = int(input("Enter To-do ID to update: "))
+            content = input("Enter new content: ")
+            is_completed = input("Is it completed? (y/n): ").lower() == 'y'
+            update_todo(todo_id, content, is_completed)
+
+        elif choice == '4':
+            todo_id = int(input("Enter To-do ID to delete: "))
+            delete_todo(todo_id)
+
+        elif choice == '5':
+            break
+
+        else:
+            print("Invalid option. Please try again.")
+
+if __name__ == "__main__":
+    main()
